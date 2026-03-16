@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Fixtures | The Economics of Water Conservation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f9f7f4;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0ebe3;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6b6b6b;
+            --accent-primary: #c73b3b;
+            --accent-secondary: #2e7d6f;
+            --border-light: #e0dcd4;
+            --border-dark: #c4bfb6;
+            --chart-green: #5a9178;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        nav a.active {
+            color: var(--text-primary);
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .measured-note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .measured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .measured-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .measured-card-name {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .measured-card-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .measured-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.88rem;
+        }
+
+        .measured-row-label {
+            color: var(--text-muted);
+        }
+
+        .measured-row-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .measured-row-value.green {
+            color: var(--chart-green);
+        }
+
+        .measured-card-link {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-secondary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .measured-card-link:hover {
+            border-bottom-color: var(--accent-secondary);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        footer {
+            border-top: 1px solid var(--border-light);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">The Economics of Water</a>
+            <nav>
+                <ul>
+                    <li><a href="about.html">About The Thesis</a></li>
+                    <li><a href="index.html">Calculator</a></li>
+                    <li><a href="index.html#behind">Equations</a></li>
+                    <li><a href="shop-fixtures.html" class="active">Shop Fixtures</a></li>
+                    <li><a href="ai-recommender.html">AI Recommender</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>Fixtures Measured</h1>
+            <p>Flow rates independently measured at 80 PSI system pressure</p>
+        </div>
+
+        <div class="measured-note">All fixtures below were tested under controlled conditions at 80 PSI static water pressure. Measured flow rates may differ from manufacturer-advertised rates due to real-world pressure, valve position, and plumbing conditions.</div>
+
+        <div class="measured-grid">
+            <div class="measured-card">
+                <div class="measured-card-name">Niagara Conservation Adjustable</div>
+                <div class="measured-card-rows">
+                    <div class="measured-row">
+                        <span class="measured-row-label">Price</span>
+                        <span class="measured-row-value">$15.94</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Advertised</span>
+                        <span class="measured-row-value">0.5 &ndash; 1.5 GPM</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Measured (at 1 GPM setting)</span>
+                        <span class="measured-row-value green">0.89 GPM</span>
+                    </div>
+                </div>
+                <a class="measured-card-link" href="https://www.amazon.com/Niagara-Conservation-N2615CH-Efficiency-Showerhead/dp/B004UA5EHK" target="_blank" rel="noopener">View on Amazon &rarr;</a>
+            </div>
+
+            <div class="measured-card">
+                <div class="measured-card-name">Delta Faucet Modern</div>
+                <div class="measured-card-rows">
+                    <div class="measured-row">
+                        <span class="measured-row-label">Price</span>
+                        <span class="measured-row-value">$32.98</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Advertised</span>
+                        <span class="measured-row-value">1.75 GPM</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Measured</span>
+                        <span class="measured-row-value green">1.68 GPM</span>
+                    </div>
+                </div>
+                <a class="measured-card-link" href="https://www.amazon.com/Faucet-3-5-inch-Single-Spray-Pressure-RP101842/dp/B09XBV2R8S" target="_blank" rel="noopener">View on Amazon &rarr;</a>
+            </div>
+
+            <div class="measured-card">
+                <div class="measured-card-name">Niagara Cone</div>
+                <div class="measured-card-rows">
+                    <div class="measured-row">
+                        <span class="measured-row-label">Price</span>
+                        <span class="measured-row-value">$19.49</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Advertised</span>
+                        <span class="measured-row-value">1.5 GPM</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Measured</span>
+                        <span class="measured-row-value green">1.39 GPM</span>
+                    </div>
+                </div>
+                <a class="measured-card-link" href="https://www.amazon.com/AM-Conservation-Group-Niagara-N2150/dp/B0080F6WTA" target="_blank" rel="noopener">View on Amazon &rarr;</a>
+            </div>
+
+            <div class="measured-card">
+                <div class="measured-card-name">High Sierra Classic</div>
+                <div class="measured-card-rows">
+                    <div class="measured-row">
+                        <span class="measured-row-label">Price</span>
+                        <span class="measured-row-value">$44.95</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Advertised</span>
+                        <span class="measured-row-value">1.2 GPM</span>
+                    </div>
+                    <div class="measured-row">
+                        <span class="measured-row-label">Measured</span>
+                        <span class="measured-row-value green">1.19 GPM</span>
+                    </div>
+                </div>
+                <a class="measured-card-link" href="https://www.amazon.com/High-Sierra-Showerheads%C2%AE-CLASSICTM-Patented/dp/B09VD22H8W" target="_blank" rel="noopener">View on Amazon &rarr;</a>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link">&larr; Back to Calculator</a>
+    </main>
+
+    <footer>
+        <p>Senior Thesis | Water Conservation Economics</p>
+        <p style="margin-top: 0.5rem;">Data: EPA WaterSense, DOE, EIA, USGS</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fixture Recommender | The Economics of Water Conservation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #f9f7f4;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0ebe3;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6b6b6b;
+            --accent-primary: #c73b3b;
+            --accent-secondary: #2e7d6f;
+            --border-light: #e0dcd4;
+            --border-dark: #c4bfb6;
+            --chart-green: #5a9178;
+            --chart-blue: #4a7c94;
+            --chart-orange: #c97b3d;
+            --chart-red: #b85450;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: var(--text-primary); }
+        nav a.active { color: var(--text-primary); }
+
+        /* Page layout */
+        .page-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+            min-height: 0;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0 1rem;
+            flex-shrink: 0;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .top-bar h2 {
+            font-size: 1.25rem;
+        }
+
+        .beta-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent-primary);
+            background: rgba(199, 59, 59, 0.08);
+            border: 1px solid rgba(199, 59, 59, 0.2);
+            border-radius: 3px;
+            padding: 0.15rem 0.45rem;
+        }
+
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .mode-btn {
+            background: none;
+            border: none;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .mode-btn.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .mode-btn:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* Chat area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-height: 0;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 0.85rem 1.1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            animation: msgIn 0.25s ease;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-msg.bot {
+            align-self: flex-start;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .chat-msg.user {
+            align-self: flex-end;
+            background: var(--text-primary);
+            color: var(--bg-secondary);
+        }
+
+        .chat-msg strong {
+            font-weight: 600;
+        }
+
+        .chat-msg .msg-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.5;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Quick reply buttons */
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-self: flex-start;
+            animation: msgIn 0.25s ease;
+        }
+
+        .quick-reply-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .quick-reply-btn:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* Results card inside chat */
+        .result-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .result-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.3rem 0;
+            font-size: 0.88rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .result-value.green { color: var(--chart-green); }
+        .result-value.red { color: var(--chart-red); }
+        .result-value.blue { color: var(--chart-blue); }
+
+        .result-divider {
+            border-top: 2px solid var(--border-dark);
+            margin: 0.3rem 0;
+        }
+
+        /* Recommendation card */
+        .rec-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .rec-card-name {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .rec-card-reason {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .rec-card-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .rec-stat {
+            text-align: center;
+        }
+
+        .rec-stat-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--chart-green);
+        }
+
+        .rec-stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .rec-card-link {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-secondary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .rec-card-link:hover {
+            border-bottom-color: var(--accent-secondary);
+        }
+
+        /* Upgrade category cards */
+        .upgrade-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .upgrade-card-name {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+
+        .upgrade-card-source {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .upgrade-card-stats {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        /* Input area */
+        .input-area {
+            padding: 0.75rem 0 1.25rem;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-row input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: var(--text-primary);
+        }
+
+        .input-row button {
+            background: var(--text-primary);
+            color: var(--bg-secondary);
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .input-row button:hover {
+            background: var(--text-secondary);
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            padding: 0.85rem 1.1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* Inquiry form */
+        .inquiry-form {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .inquiry-form h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .inquiry-form input,
+        .inquiry-form textarea {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            transition: border-color 0.2s;
+        }
+
+        .inquiry-form input:focus,
+        .inquiry-form textarea:focus {
+            outline: none;
+            border-color: var(--text-primary);
+        }
+
+        .inquiry-form textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .inquiry-form button {
+            background: var(--accent-secondary);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.25rem;
+        }
+
+        .inquiry-form button:hover {
+            background: #246b5e;
+        }
+
+        .inquiry-form .inquiry-success {
+            color: var(--chart-green);
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 0.5rem 0;
+        }
+
+        .inquiry-form label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Equation/detail card */
+        .equation-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 0.85rem 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .equation-card .eq-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .equation-card code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            background: rgba(0,0,0,0.04);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+        }
+
+        .fun-fact {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 0.6rem 0.9rem;
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--accent-secondary);
+            border-radius: 0 4px 4px 0;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .top-bar { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .chat-msg { max-width: 92%; }
+            nav ul { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">The Economics of Water</a>
+            <nav>
+                <ul>
+                    <li><a href="about.html">About The Thesis</a></li>
+                    <li><a href="index.html">Calculator</a></li>
+                    <li><a href="index.html#behind">Equations</a></li>
+                    <li><a href="shop-fixtures.html">Shop Fixtures</a></li>
+                    <li><a href="ai-recommender.html" class="active">AI Recommender</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrap">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <h2>Fixture Recommender</h2>
+                <span class="beta-badge">Beta</span>
+            </div>
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="modeShower" onclick="setMode('showerheads')">Showerheads</button>
+                <button class="mode-btn" id="modeAll" onclick="setMode('all')">All Efficiency Upgrades</button>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea"></div>
+
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="userInput" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════
+        // STATE
+        // ══════════════════════════════════════════
+        let mode = 'showerheads';
+        let step = 0;
+        let userData = {};
+        let ownershipAsked = false;
+        let messageCount = 0; // for varying personality
+
+        // ══════════════════════════════════════════
+        // CONSTANTS (EPA, DOE, EIA, Energy Star)
+        // ══════════════════════════════════════════
+        const C = {
+            electricityRate: 0.16,       // $/kWh US avg (EIA)
+            commercialRate: 0.10,        // $/kWh commercial avg
+            waterRatePerGal: 0.015,      // $ incl sewer
+            energyPerGalHeated: 0.171,   // kWh (55F->120F, 100% eff)
+            electricWHeff: 0.92,
+            gasWHeff: 0.60,
+            hotWaterFraction: 0.70,      // % of shower water that's hot
+            faucetHotFraction: 0.50,
+            hvacPctOfBill: 0.45,
+            waterHeatingPct: 0.18,
+            avgAnnualBill: 2000,
+            hpToKw: 0.746,
+            flushesPerPersonDay: 5,
+        };
+
+        // ══════════════════════════════════════════
+        // PERSONALITY ENGINE
+        // ══════════════════════════════════════════
+        function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        const acks = {
+            positive: ["Nice!", "Great choice.", "Love it.", "Solid.", "Perfect."],
+            neutral: ["Got it.", "Noted.", "Okay!", "Alright.", "Cool."],
+            number: ["Thanks!", "Got it.", "Okay, noted.", "Perfect."],
+            understood: ["Makes sense.", "I hear you.", "Totally understand.", "Fair enough."]
+        };
+
+        const transitions = [
+            "Now here's where it gets interesting --",
+            "Alright, next question --",
+            "Okay so --",
+            "Moving on --",
+            "Right, so --",
+        ];
+
+        const funFacts = {
+            shower: [
+                "Did you know? The average American shower uses about 17 gallons of water. That's roughly 6,200 gallons per person per year -- just from showering.",
+                "Here's a wild stat: water heating is the second-largest energy expense in most homes, accounting for about 18% of your utility bill.",
+                "Fun fact -- the federal showerhead standard is 2.5 GPM, set in 1992. Before that, showerheads could flow at 5.5 GPM or more.",
+            ],
+            led: [
+                "Quick context: a single LED bulb saves about $9/year compared to incandescent. Multiply that by 25 bulbs and it adds up fast.",
+                "LEDs last about 25,000 hours -- that's roughly 22 years at 3 hours/day. An incandescent? About 1,000 hours, or just under a year.",
+            ],
+            water: [
+                "Toilets are actually the #1 indoor water user -- about 30% of all household water use goes straight down the bowl.",
+                "A single leaky faucet dripping once per second wastes over 3,000 gallons per year. That's 180 showers worth of water.",
+            ],
+            heating: [
+                "HVAC is typically 42-48% of a home's energy bill -- the single largest expense. Even small improvements here make a big difference.",
+                "Here's something most people don't know: lowering your thermostat by just 7-10°F for 8 hours a day can save up to 10% on your annual heating bill.",
+            ],
+            building: [
+                "According to Lawrence Berkeley National Lab, the median ESCO project achieves 18% energy reduction, with 75% of projects meeting or exceeding their savings guarantees.",
+                "The affinity laws in engineering show that reducing a fan or pump speed by just 20% cuts power consumption by nearly 50%. That's the physics behind VFD savings.",
+            ],
+        };
+
+        function maybeFunFact(topic) {
+            if (Math.random() < 0.4 && funFacts[topic]) {
+                return pick(funFacts[topic]);
+            }
+            return null;
+        }
+
+        // ══════════════════════════════════════════
+        // HELPER: extract number from any text
+        // ══════════════════════════════════════════
+        function extractNumber(text) {
+            const rangeMatch = text.match(/(\d[\d,]*\.?\d*)\s*[-–]\s*(\d[\d,]*\.?\d*)/);
+            if (rangeMatch) {
+                const a = parseFloat(rangeMatch[1].replace(/,/g, ''));
+                const b = parseFloat(rangeMatch[2].replace(/,/g, ''));
+                return (a + b) / 2;
+            }
+            const match = text.replace(/,/g, '').match(/\d+\.?\d*/);
+            return match ? parseFloat(match[0]) : null;
+        }
+
+        // ── Initial ownership question (shared by both modes) ──
+        const ownershipStep = {
+            question: "Hi there! To give you the best recommendations, I need to know a bit about you. Which best describes your situation?",
+            field: 'ownerType',
+            parse: v => {
+                const l = v.toLowerCase();
+                if (l.includes('building') || l.includes('manage') || l.includes('landlord') || l.includes('property') || l.includes('multi')) return 'building_owner';
+                if (l.includes('own') || l.includes('home') || l.includes('house') || l.includes('bought')) return 'homeowner';
+                if (l.includes('rent') || l.includes('lease') || l.includes('tenant') || l.includes('apart')) return 'renter';
+                // Fallback: try to make sense of it
+                if (l.includes('yes') || l.includes('1')) return 'homeowner';
+                if (l.includes('2')) return 'renter';
+                if (l.includes('3')) return 'building_owner';
+                return null;
+            },
+            quickReplies: ['I own my home', 'I rent', 'Building owner / manager']
+        };
+
+        // ── Fixture database ──
+        const fixtures = [
+            {
+                name: 'Niagara Conservation Adjustable',
+                price: 15.94,
+                advertisedGPM: '0.5-1.5',
+                measuredGPM: 0.89,
+                url: 'https://www.amazon.com/Niagara-Conservation-N2615CH-Efficiency-Showerhead/dp/B004UA5EHK',
+                bestFor: 'maximum savings',
+                note: 'Adjustable flow; tested at 1 GPM setting'
+            },
+            {
+                name: 'Niagara Cone',
+                price: 19.49,
+                advertisedGPM: '1.5',
+                measuredGPM: 1.39,
+                url: 'https://www.amazon.com/AM-Conservation-Group-Niagara-N2150/dp/B0080F6WTA',
+                bestFor: 'best value',
+                note: 'Good balance of savings and shower experience'
+            },
+            {
+                name: 'High Sierra Classic',
+                price: 44.95,
+                advertisedGPM: '1.2',
+                measuredGPM: 1.19,
+                url: 'https://www.amazon.com/High-Sierra-Showerheads%C2%AE-CLASSICTM-Patented/dp/B09VD22H8W',
+                bestFor: 'best feel at low flow',
+                note: 'Patented design maintains pressure feel at low flow'
+            },
+            {
+                name: 'Delta Faucet Modern',
+                price: 32.98,
+                advertisedGPM: '1.75',
+                measuredGPM: 1.68,
+                url: 'https://www.amazon.com/Faucet-3-5-inch-Single-Spray-Pressure-RP101842/dp/B09XBV2R8S',
+                bestFor: 'closest to standard feel',
+                note: 'Minor savings but familiar shower experience'
+            }
+        ];
+
+        // ══════════════════════════════════════════
+        // UPGRADES DATABASE
+        // Each has: equation info, comparison fact, detailed savings calc
+        // Sources: EPA, DOE, Energy Star, ESCO studies, ACEEE, ASHRAE
+        // ══════════════════════════════════════════
+        const upgrades = [
+            // ─── RESIDENTIAL: Water ───
+            {
+                name: 'Low-Flow Showerheads',
+                category: 'water', scale: 'residential',
+                cost: '$15 - $45',
+                annualSavings: '$70 - $250',
+                payback: '1 - 6 months',
+                source: 'EPA WaterSense',
+                detail: 'Replacing 2.5 GPM heads with 1.5 GPM or lower. Saves water and water-heating energy.',
+                savingsLow: 70, savingsHigh: 250,
+                renterOk: true
+            },
+            {
+                name: 'Low-Flow Faucet Aerators',
+                category: 'water', scale: 'residential',
+                cost: '$2 - $10 per faucet',
+                annualSavings: '$30 - $100',
+                payback: 'Under 1 month',
+                source: 'EPA WaterSense',
+                detail: 'Reducing faucet flow from 2.2 GPM to 1.0-1.5 GPM. Kitchen and bathroom sinks.',
+                savingsLow: 30, savingsHigh: 100,
+                renterOk: true
+            },
+            {
+                name: 'High-Efficiency Toilets',
+                category: 'water', scale: 'residential',
+                cost: '$100 - $300 per toilet',
+                annualSavings: '$50 - $140 per toilet',
+                payback: '1 - 3 years',
+                source: 'EPA WaterSense',
+                detail: 'Replacing 3.5+ GPF toilets with 1.28 GPF WaterSense models. Saves ~13,000 gal/year per toilet.',
+                savingsLow: 50, savingsHigh: 140,
+                renterOk: false
+            },
+            {
+                name: 'Water Heater Insulation Blanket',
+                category: 'water', scale: 'residential',
+                cost: '$20 - $40',
+                annualSavings: '$25 - $70',
+                payback: '3 - 12 months',
+                source: 'DOE',
+                detail: 'Wrapping older water heaters (especially in unheated spaces) reduces standby heat loss 25-45%.',
+                savingsLow: 25, savingsHigh: 70,
+                renterOk: false
+            },
+            {
+                name: 'Hot Water Pipe Insulation',
+                category: 'water', scale: 'residential',
+                cost: '$10 - $30',
+                annualSavings: '$15 - $50',
+                payback: '2 - 8 months',
+                source: 'DOE',
+                detail: 'Insulating first 6 feet of hot/cold pipes at water heater. Raises water temp 2-4 degrees F.',
+                savingsLow: 15, savingsHigh: 50,
+                renterOk: false
+            },
+            {
+                name: 'Heat Pump Water Heater',
+                category: 'water', scale: 'residential',
+                cost: '$1,500 - $3,500',
+                annualSavings: '$300 - $550',
+                payback: '4 - 8 years',
+                source: 'DOE / Energy Star',
+                detail: 'Heat pump water heaters are 2-3x more efficient than conventional electric tanks. Eligible for federal tax credits up to $2,000.',
+                savingsLow: 300, savingsHigh: 550,
+                renterOk: false
+            },
+            // ─── RESIDENTIAL: Energy ───
+            {
+                name: 'LED Lighting Retrofit',
+                category: 'energy', scale: 'residential',
+                cost: '$2 - $8 per bulb',
+                annualSavings: '$75 - $200 (whole home)',
+                payback: '1 - 4 months per bulb',
+                source: 'DOE / Energy Star',
+                detail: 'LEDs use 75% less energy than incandescent and last 25x longer. Replacing 20 bulbs saves ~$100/yr.',
+                savingsLow: 75, savingsHigh: 200,
+                renterOk: true
+            },
+            {
+                name: 'Smart Thermostat',
+                category: 'energy', scale: 'residential',
+                cost: '$100 - $250',
+                annualSavings: '$50 - $180',
+                payback: '1 - 3 years',
+                source: 'Energy Star',
+                detail: 'Energy Star certified smart thermostats save ~8% on heating/cooling bills on average.',
+                savingsLow: 50, savingsHigh: 180,
+                renterOk: true
+            },
+            {
+                name: 'Smart Power Strips',
+                category: 'energy', scale: 'residential',
+                cost: '$25 - $50',
+                annualSavings: '$50 - $150',
+                payback: '2 - 6 months',
+                source: 'DOE / NREL',
+                detail: 'Eliminates phantom loads from electronics. Average home wastes 5-10% of electricity on standby power.',
+                savingsLow: 50, savingsHigh: 150,
+                renterOk: true
+            },
+            {
+                name: 'Attic Insulation Upgrade',
+                category: 'energy', scale: 'residential',
+                cost: '$1,500 - $3,500',
+                annualSavings: '$200 - $600',
+                payback: '3 - 7 years',
+                source: 'DOE',
+                detail: 'Bringing attic insulation up to R-38 or R-49. Largest single energy-saving retrofit for most homes.',
+                savingsLow: 200, savingsHigh: 600,
+                renterOk: false, needsAttic: true
+            },
+            {
+                name: 'Air Sealing (Envelope)',
+                category: 'energy', scale: 'residential',
+                cost: '$350 - $1,000',
+                annualSavings: '$150 - $400',
+                payback: '1 - 4 years',
+                source: 'DOE / ACEEE',
+                detail: 'Professional blower-door-guided air sealing of gaps, cracks, and penetrations. Typical home leaks 25-40% of conditioned air.',
+                savingsLow: 150, savingsHigh: 400,
+                renterOk: false
+            },
+            {
+                name: 'Energy-Efficient Windows',
+                category: 'energy', scale: 'residential',
+                cost: '$300 - $700 per window',
+                annualSavings: '$125 - $465 (whole home)',
+                payback: '5 - 15 years',
+                source: 'Energy Star',
+                detail: 'Replacing single-pane windows with Energy Star models. Savings vary greatly by climate zone.',
+                savingsLow: 125, savingsHigh: 465,
+                renterOk: false
+            },
+            {
+                name: 'HVAC Tune-Up & Duct Sealing',
+                category: 'energy', scale: 'residential',
+                cost: '$100 - $300',
+                annualSavings: '$80 - $250',
+                payback: '6 - 18 months',
+                source: 'Energy Star / DOE',
+                detail: 'Annual HVAC maintenance + sealing duct leaks. Leaky ducts can waste 20-30% of heated/cooled air.',
+                savingsLow: 80, savingsHigh: 250,
+                renterOk: false
+            },
+            {
+                name: 'Heat Pump HVAC System',
+                category: 'energy', scale: 'residential',
+                cost: '$4,000 - $12,000',
+                annualSavings: '$500 - $1,500',
+                payback: '5 - 10 years',
+                source: 'DOE / IRA Tax Credits',
+                detail: 'Air-source heat pumps are 2-3x more efficient than furnaces for heating and match AC for cooling. Federal tax credits cover up to $2,000.',
+                savingsLow: 500, savingsHigh: 1500,
+                renterOk: false
+            },
+            // ─── BUILDING OWNER / COMMERCIAL ───
+            {
+                name: 'Building Automation System (BAS)',
+                category: 'energy', scale: 'commercial',
+                cost: '$2 - $7 per sq ft',
+                annualSavings: '10 - 25% of energy costs',
+                payback: '2 - 5 years',
+                source: 'ASHRAE / DOE ESCO Studies',
+                detail: 'Centralized control of HVAC, lighting, and schedules. ESCO projects show median 18% energy reduction. Most impactful in buildings over 25,000 sq ft.',
+                savingsLow: 2000, savingsHigh: 15000,
+                renterOk: false
+            },
+            {
+                name: 'Variable Frequency Drives (VFDs)',
+                category: 'energy', scale: 'commercial',
+                cost: '$500 - $5,000 per motor',
+                annualSavings: '20 - 50% per motor energy',
+                payback: '1 - 3 years',
+                source: 'DOE / ACEEE',
+                detail: 'VFDs on HVAC fans and pumps match motor speed to actual demand. ESCO data shows 30-50% energy savings on motors. Per the affinity laws, a 20% speed reduction yields ~50% energy savings.',
+                savingsLow: 1500, savingsHigh: 8000,
+                renterOk: false
+            },
+            {
+                name: 'Demand-Controlled Ventilation (DCV)',
+                category: 'energy', scale: 'commercial',
+                cost: '$1 - $3 per sq ft',
+                annualSavings: '10 - 30% of HVAC costs',
+                payback: '2 - 5 years',
+                source: 'ASHRAE 62.1 / DOE',
+                detail: 'CO2 sensors modulate outside air volume to match actual occupancy. Avoids over-ventilating empty spaces. Especially effective in conference rooms, lobbies, and variable-occupancy areas.',
+                savingsLow: 1000, savingsHigh: 6000,
+                renterOk: false
+            },
+            {
+                name: 'Boiler / Chiller Upgrade',
+                category: 'energy', scale: 'commercial',
+                cost: '$15,000 - $150,000+',
+                annualSavings: '15 - 35% of heating/cooling',
+                payback: '5 - 12 years',
+                source: 'ASHRAE / ESCO Performance Data',
+                detail: 'Replacing aging boilers (< 80% eff.) with condensing models (95%+) or old chillers with high-COP units. Frequently the largest single measure in ESCO projects.',
+                savingsLow: 5000, savingsHigh: 40000,
+                renterOk: false
+            },
+            {
+                name: 'Cool / Reflective Roof',
+                category: 'energy', scale: 'commercial',
+                cost: '$1.50 - $5 per sq ft',
+                annualSavings: '10 - 30% of cooling costs',
+                payback: '3 - 8 years',
+                source: 'DOE Cool Roof Calculator / LBNL',
+                detail: 'High solar-reflectance roofing reduces roof surface temps by 50-60°F, cutting AC load. Most effective in hot climates. Can also extend roof lifespan.',
+                savingsLow: 500, savingsHigh: 5000,
+                renterOk: false
+            },
+            {
+                name: 'Common Area LED Retrofit',
+                category: 'energy', scale: 'commercial',
+                cost: '$3 - $6 per sq ft',
+                annualSavings: '30 - 60% of lighting costs',
+                payback: '1 - 3 years',
+                source: 'DOE / Energy Star',
+                detail: 'Replacing fluorescent/HID with LED + occupancy sensors in hallways, garages, stairwells. One of the fastest-payback ESCO measures. Typical building saves $0.40-$0.80/sq ft/yr.',
+                savingsLow: 1500, savingsHigh: 8000,
+                renterOk: false
+            },
+            {
+                name: 'Central Domestic Hot Water Optimization',
+                category: 'water', scale: 'commercial',
+                cost: '$2,000 - $15,000',
+                annualSavings: '$1,500 - $8,000',
+                payback: '1 - 3 years',
+                source: 'EPA WaterSense / ASHRAE',
+                detail: 'Recirculation pump controls, mixing valves, pipe insulation, and low-flow fixtures across all units. Multi-family buildings waste 15-30% of hot water through recirculation losses.',
+                savingsLow: 1500, savingsHigh: 8000,
+                renterOk: false
+            },
+            {
+                name: 'Submeter Individual Units',
+                category: 'water', scale: 'commercial',
+                cost: '$200 - $500 per unit',
+                annualSavings: '15 - 25% of water/energy',
+                payback: '1 - 3 years',
+                source: 'EPA / IREM Studies',
+                detail: 'Installing submeters for water and/or electricity creates accountability. Studies show 15-25% reduction in consumption when tenants pay for their own usage.',
+                savingsLow: 500, savingsHigh: 3000,
+                renterOk: false
+            },
+            {
+                name: 'Energy Performance Contract (ESCO)',
+                category: 'energy', scale: 'commercial',
+                cost: 'No upfront (performance-based)',
+                annualSavings: '15 - 40% of total energy',
+                payback: '7 - 15 years (contract term)',
+                source: 'DOE Federal ESCO Program / NAESCO',
+                detail: 'ESCOs finance and guarantee energy savings through comprehensive retrofits. The ESCO covers upfront costs and is paid from verified savings. Over $8B in ESCO projects completed in the U.S. Average 20-25% energy reduction per Lawrence Berkeley National Lab.',
+                savingsLow: 5000, savingsHigh: 50000,
+                renterOk: false
+            }
+        ];
+
+        // ══════════════════════════════════════════
+        // UPGRADE EQUATIONS & COMPARISONS (used in results)
+        // ══════════════════════════════════════════
+        const upgradeEquations = {
+            'Low-Flow Showerheads': {
+                calc: (u) => {
+                    const gpmOld = 2.5, gpmNew = 1.5, min = 8, showers = 2;
+                    const galSaved = (gpmOld - gpmNew) * min * showers * 365;
+                    const waterSaved = galSaved * C.waterRatePerGal;
+                    const energySaved = galSaved * C.hotWaterFraction * C.energyPerGalHeated / C.electricWHeff * C.electricityRate;
+                    return Math.round(waterSaved + energySaved);
+                },
+                equation: 'Savings = (old_GPM - new_GPM) x minutes x showers/day x 365 x (water_cost + energy_cost_per_gallon)',
+                comparison: 'Switching from 2.5 to 1.5 GPM saves ~5,840 gallons/year per household -- enough water for 190 loads of laundry.',
+            },
+            'Low-Flow Faucet Aerators': {
+                calc: (u) => {
+                    const gpmOld = 2.2, gpmNew = 1.5, minPerPerson = 8, persons = 3;
+                    const galSaved = (gpmOld - gpmNew) * minPerPerson * persons * 365;
+                    const waterCost = galSaved * C.waterRatePerGal;
+                    const energyCost = galSaved * C.faucetHotFraction * C.energyPerGalHeated / C.electricWHeff * C.electricityRate;
+                    return Math.round(waterCost + energyCost);
+                },
+                equation: 'Savings = (2.2 - 1.5 GPM) x 8 min/person/day x people x 365 x (water + energy cost)',
+                comparison: 'A $5 faucet aerator has the highest ROI of any fixture -- it often pays for itself within a single week.',
+            },
+            'LED Lighting Retrofit': {
+                calc: (u) => {
+                    const wOld = 60, wNew = 9, hrs = 3, bulbs = 25;
+                    const kwhSaved = (wOld - wNew) * hrs * 365 / 1000 * bulbs;
+                    return Math.round(kwhSaved * C.electricityRate);
+                },
+                equation: 'Savings = (60W - 9W) x hours/day x 365 / 1000 x bulbs x electricity_rate',
+                comparison: 'Switching 25 bulbs saves ~1,400 kWh/year -- enough to run a refrigerator for 2.5 years.',
+            },
+            'Common Area LED Retrofit': {
+                calc: (u) => { return Math.round(u.savingsLow + (u.savingsHigh - u.savingsLow) * 0.5); },
+                equation: 'Savings = sq_ft x $0.40-$0.80/sqft/year (lighting cost reduction of 30-60%)',
+                comparison: 'LED retrofits in common areas are consistently the fastest-payback measure in ESCO projects.',
+            },
+            'Smart Thermostat': {
+                calc: (u) => {
+                    const hvacCost = C.avgAnnualBill * C.hvacPctOfBill;
+                    return Math.round(hvacCost * 0.10);
+                },
+                equation: 'Savings = annual_bill x 45% (HVAC share) x 8-12% (smart thermostat reduction)',
+                comparison: 'Nest\'s real-world data shows 10-12% heating savings and 15% cooling savings. Energy Star certifies 8% average.',
+            },
+            'High-Efficiency Toilets': {
+                calc: (u) => {
+                    const gpfOld = 3.5, gpfNew = 1.28, persons = 3;
+                    const galSaved = (gpfOld - gpfNew) * C.flushesPerPersonDay * persons * 365;
+                    return Math.round(galSaved * C.waterRatePerGal);
+                },
+                equation: 'Savings = (3.5 - 1.28 GPF) x 5 flushes/person/day x people x 365 x water_rate',
+                comparison: 'A family of 4 replacing old 3.5 GPF toilets saves ~16,000 gallons/year. That\'s a full swimming pool.',
+            },
+            'Heat Pump Water Heater': {
+                calc: (u) => {
+                    const gpd = 50;
+                    const kwhStandard = gpd * 365 * C.energyPerGalHeated / C.electricWHeff;
+                    const kwhHPWH = gpd * 365 * C.energyPerGalHeated / 3.0;
+                    return Math.round((kwhStandard - kwhHPWH) * C.electricityRate);
+                },
+                equation: 'Savings = daily_gal x 365 x 0.171 kWh/gal x (1/0.92 - 1/3.0) x rate',
+                comparison: 'A heat pump water heater works like a reverse air conditioner -- it\'s 2-3x more efficient because it moves heat instead of generating it.',
+            },
+            'Variable Frequency Drives (VFDs)': {
+                calc: (u) => { return Math.round(u.savingsLow + (u.savingsHigh - u.savingsLow) * 0.5); },
+                equation: 'Power_new = Power_old x (speed_new / speed_old)^3. A 20% speed reduction = 49% power savings.',
+                comparison: 'The affinity laws mean small speed reductions yield massive energy savings. This is pure physics, not an estimate.',
+            },
+            'Building Automation System (BAS)': {
+                calc: (u) => { return Math.round(u.savingsLow + (u.savingsHigh - u.savingsLow) * 0.5); },
+                equation: 'Savings = building_sqft x $2.75/sqft x 45% (HVAC) x 15-25% (BAS reduction)',
+                comparison: 'ASHRAE studies show median 16% savings for BAS upgrades in existing buildings.',
+            },
+        };
+
+        // ══════════════════════════════════════════
+        // SHOWERHEAD CONVERSATION FLOW
+        // ══════════════════════════════════════════
+        const showerSteps = [
+            {
+                question: "How many people take daily showers in your household?",
+                field: 'people',
+                ackType: 'number',
+                parse: v => {
+                    const n = extractNumber(v);
+                    if (n && n > 0 && n < 100) return Math.round(n);
+                    const words = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+                    for (const [w, num] of Object.entries(words)) {
+                        if (v.toLowerCase().includes(w)) return num;
+                    }
+                    return null;
+                },
+                quickReplies: ['1', '2', '3', '4', '5+'],
+                funFactTopic: null,
+            },
+            {
+                question: "And how long is the average shower? (in minutes)",
+                field: 'duration',
+                ackType: 'number',
+                parse: v => {
+                    const n = extractNumber(v);
+                    if (n && n > 0 && n < 120) return n;
+                    return null;
+                },
+                quickReplies: ['5', '8', '10', '15'],
+                funFactTopic: 'shower',
+            },
+            {
+                question: "Do you know your current showerhead's flow rate? Most standard heads are around 2.5 GPM. If you're not sure, no worries -- I'll assume standard.",
+                field: 'currentGPM',
+                ackType: 'neutral',
+                parse: v => {
+                    const l = v.toLowerCase();
+                    if (l.includes('no') || l.includes("don't") || l.includes('sure') || l.includes('idk') || l.includes('standard') || l.includes('default')) return 2.5;
+                    const n = extractNumber(v);
+                    if (n && n > 0 && n < 10) return n;
+                    return 2.5;
+                },
+                quickReplies: ['2.5 GPM (standard)', '2.0 GPM', "Not sure"],
+                funFactTopic: null,
+            },
+            {
+                question: "Last one -- what matters most to you?",
+                field: 'priority',
+                ackType: 'neutral',
+                parse: v => {
+                    const l = v.toLowerCase();
+                    if (l.includes('sav') || l.includes('cheap') || l.includes('money') || l.includes('cost') || l.includes('low')) return 'savings';
+                    if (l.includes('feel') || l.includes('comfort') || l.includes('pressure') || l.includes('experience') || l.includes('strong')) return 'comfort';
+                    return 'value';
+                },
+                quickReplies: ['Maximum savings', 'Best shower feel', 'Balance of both'],
+                funFactTopic: null,
+            }
+        ];
+
+        // ══════════════════════════════════════════
+        // ALL-UPGRADES CONVERSATION FLOW
+        // ══════════════════════════════════════════
+        function getAllSteps() {
+            const isBuilding = userData.ownerType === 'building_owner';
+            const isRenter = userData.ownerType === 'renter';
+
+            const steps = [];
+
+            // Building type question
+            if (isBuilding) {
+                steps.push({
+                    question: "What type of building do you manage?",
+                    field: 'homeType',
+                    parse: v => {
+                        const l = v.toLowerCase();
+                        if (l.includes('apart') || l.includes('multi') || l.includes('residential') || l.includes('unit')) return 'multifamily';
+                        if (l.includes('office') || l.includes('commercial') || l.includes('retail') || l.includes('store')) return 'commercial';
+                        if (l.includes('mixed')) return 'mixed';
+                        return 'multifamily'; // sensible default
+                    },
+                    quickReplies: ['Multi-family residential', 'Commercial / Office', 'Mixed-use']
+                });
+                steps.push({
+                    question: "Thanks. How many units, or what's the approximate square footage?",
+                    field: 'buildingSize',
+                    parse: v => {
+                        const n = extractNumber(v);
+                        return n && n > 0 ? Math.round(n) : null;
+                    },
+                    quickReplies: ['5-20 units', '20-50 units', '50-100 units', '100+ units']
+                });
+            } else {
+                steps.push({
+                    question: "What type of home do you live in?",
+                    field: 'homeType',
+                    parse: v => {
+                        const l = v.toLowerCase();
+                        if (l.includes('house') || l.includes('single') || l.includes('detach') || l.includes('home')) return 'house';
+                        if (l.includes('apart') || l.includes('condo') || l.includes('unit') || l.includes('flat')) return 'apartment';
+                        if (l.includes('town') || l.includes('row') || l.includes('duplex')) return 'townhouse';
+                        return 'house'; // sensible default
+                    },
+                    quickReplies: isRenter
+                        ? ['Apartment / Condo', 'Single-family house', 'Townhouse']
+                        : ['Single-family house', 'Apartment / Condo', 'Townhouse']
+                });
+            }
+
+            // Age
+            steps.push({
+                question: isBuilding
+                    ? "Roughly how old is the building? This helps me estimate insulation and equipment condition."
+                    : "Roughly how old is your home? Older homes tend to have more savings potential.",
+                field: 'homeAge',
+                parse: v => {
+                    const l = v.toLowerCase();
+                    // Handle word descriptions
+                    if (l.includes('new') || l.includes('under 10') || l.includes('recent')) return 5;
+                    if (l.includes('50+') || l.includes('over 50') || l.includes('old') || l.includes('pre-war') || l.includes('prewar')) return 60;
+                    const n = extractNumber(v);
+                    if (n === null) return 20; // default to 20 years
+                    if (n > 1800 && n < 2030) return 2026 - n;
+                    if (n >= 0 && n < 200) return n;
+                    return 20;
+                },
+                quickReplies: ['Under 10 years', '10-25 years', '25-50 years', '50+ years']
+            });
+
+            // Heating type
+            steps.push({
+                question: isBuilding
+                    ? "What's the primary heating system? This affects which upgrades will save the most."
+                    : "What's your primary heating source?",
+                field: 'heatingType',
+                parse: v => {
+                    const l = v.toLowerCase();
+                    if (l.includes('gas') || l.includes('natural')) return 'gas';
+                    if (l.includes('electric') || l.includes('heat pump') || l.includes('mini') || l.includes('split')) return 'electric';
+                    if (l.includes('oil') || l.includes('fuel')) return 'oil';
+                    if (l.includes('steam') || l.includes('boiler') || l.includes('radiat')) return 'boiler';
+                    return 'unknown'; // default gracefully
+                },
+                quickReplies: isBuilding
+                    ? ['Natural gas boiler', 'Electric', 'Oil / Steam', 'Not sure']
+                    : ['Natural gas', 'Electric / Heat pump', 'Oil', 'Not sure'],
+                funFactTopic: 'heating',
+            });
+
+            // Monthly bill
+            steps.push({
+                question: isBuilding
+                    ? "What's the approximate total monthly utility spend for the building? A rough estimate is fine."
+                    : "What's your approximate monthly utility bill? (electric + gas + water combined — a rough number is fine)",
+                field: 'monthlyBill',
+                parse: v => {
+                    const n = extractNumber(v);
+                    if (n && n > 0) return n;
+                    // Handle word estimates
+                    const l = v.toLowerCase();
+                    if (l.includes('low') || l.includes('cheap')) return isBuilding ? 3000 : 120;
+                    if (l.includes('high') || l.includes('lot') || l.includes('expensive')) return isBuilding ? 30000 : 350;
+                    return isBuilding ? 10000 : 200; // sensible defaults
+                },
+                quickReplies: isBuilding
+                    ? ['$2,000-5,000', '$5,000-15,000', '$15,000-50,000', '$50,000+']
+                    : ['$100-150', '$150-250', '$250-400', '$400+']
+            });
+
+            // Pain points
+            steps.push({
+                question: isBuilding
+                    ? "What's driving your interest in efficiency upgrades?"
+                    : "What's your biggest motivation for looking into upgrades?",
+                field: 'painPoint',
+                parse: v => {
+                    const l = v.toLowerCase();
+                    if (l.includes('bill') || l.includes('cost') || l.includes('expensive') || l.includes('spend') || l.includes('money') || l.includes('save')) return 'high_bills';
+                    if (l.includes('comfort') || l.includes('draft') || l.includes('cold') || l.includes('hot') || l.includes('temp')) return 'comfort';
+                    if (l.includes('water') || l.includes('leak') || l.includes('waste') || l.includes('plumb')) return 'water_waste';
+                    if (l.includes('environ') || l.includes('green') || l.includes('carbon') || l.includes('sustain') || l.includes('climate') || l.includes('eco')) return 'environment';
+                    if (l.includes('tenant') || l.includes('complaint') || l.includes('reside') || l.includes('occupy')) return 'tenant_complaints';
+                    if (l.includes('regulat') || l.includes('compliance') || l.includes('law') || l.includes('code') || l.includes('ll84') || l.includes('bench')) return 'compliance';
+                    return 'high_bills'; // most common reason
+                },
+                quickReplies: isBuilding
+                    ? ['High utility costs', 'Tenant complaints', 'Regulatory compliance', 'Sustainability goals']
+                    : ['High utility bills', 'Comfort issues (drafts)', 'Water waste', 'Environmental impact']
+            });
+
+            // Budget
+            if (!isRenter) {
+                steps.push({
+                    question: isBuilding
+                        ? "What's your budget range for these improvements? (ESCO financing can eliminate upfront costs for larger projects)"
+                        : "Last question — roughly how much are you open to investing?",
+                    field: 'budget',
+                    parse: v => {
+                        const l = v.toLowerCase();
+                        if (l.includes('min') || l.includes('low') || l.includes('cheap') || l.includes('little') || l.includes('small')) return 'minimal';
+                        if (l.includes('no limit') || l.includes('what') || l.includes('whatever') || l.includes('esco') || l.includes('financ') || l.includes('open') || l.includes('flex')) return 'no_limit';
+                        if (l.includes('sig') || l.includes('serious') || l.includes('big') || l.includes('major')) return 'significant';
+                        // Check dollar amounts
+                        const n = extractNumber(v);
+                        if (n !== null) {
+                            if (isBuilding) {
+                                if (n < 5000) return 'minimal';
+                                if (n < 50000) return 'moderate';
+                                return 'significant';
+                            } else {
+                                if (n < 200) return 'minimal';
+                                if (n < 2000) return 'moderate';
+                                return 'significant';
+                            }
+                        }
+                        return 'moderate'; // default
+                    },
+                    quickReplies: isBuilding
+                        ? ['Under $5,000', '$5,000 - $50,000', '$50,000+', 'Open to ESCO financing']
+                        : ['Minimal (under $100)', 'Moderate ($100-$1,000)', 'Significant ($1,000-$5,000)', 'Whatever makes sense']
+                });
+            }
+
+            // Existing upgrades
+            steps.push({
+                question: "Almost done! Have you already made any efficiency upgrades? This way I won't recommend things you've already done.",
+                field: 'existing',
+                parse: v => v.toLowerCase(), // always succeeds
+                quickReplies: isBuilding
+                    ? ['None', 'LED lighting', 'BAS / Controls', 'Low-flow fixtures', 'Boiler upgrade']
+                    : ['None', 'LED bulbs', 'Smart thermostat', 'Low-flow fixtures', 'Insulation'],
+                funFactTopic: isBuilding ? 'building' : 'led',
+            });
+
+            return steps;
+        }
+
+        // ══════════════════════════════════════════
+        // CHAT ENGINE (with personality)
+        // ══════════════════════════════════════════
+        function addMessage(text, type, extra) {
+            const chatArea = document.getElementById('chatArea');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg ' + type;
+            if (type === 'bot') {
+                msg.innerHTML = '<div class="msg-label">Advisor</div>' + text;
+            } else {
+                msg.textContent = text;
+            }
+            chatArea.appendChild(msg);
+            if (extra) chatArea.appendChild(extra);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addQuickReplies(replies) {
+            const chatArea = document.getElementById('chatArea');
+            const wrap = document.createElement('div');
+            wrap.className = 'quick-replies';
+            wrap.id = 'quickReplies';
+            replies.forEach(r => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-reply-btn';
+                btn.textContent = r;
+                btn.onclick = function() {
+                    document.getElementById('userInput').value = r;
+                    sendMessage();
+                };
+                wrap.appendChild(btn);
+            });
+            chatArea.appendChild(wrap);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function removeQuickReplies() {
+            const qr = document.getElementById('quickReplies');
+            if (qr) qr.remove();
+        }
+
+        function showTyping() {
+            const chatArea = document.getElementById('chatArea');
+            const el = document.createElement('div');
+            el.className = 'typing-indicator';
+            el.id = 'typingIndicator';
+            el.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            chatArea.appendChild(el);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function hideTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        // Variable delay based on message length + randomness
+        function getDelay(text) {
+            const base = 350 + Math.random() * 300;
+            const perChar = 18 + Math.random() * 12;
+            return Math.min(base + text.length * perChar, 1800);
+        }
+
+        function botSay(text, quickReplies, extra) {
+            showTyping();
+            const delay = getDelay(text);
+            messageCount++;
+            setTimeout(() => {
+                hideTyping();
+                addMessage(text, 'bot', extra);
+                if (quickReplies) addQuickReplies(quickReplies);
+            }, delay);
+        }
+
+        // Multi-bubble: sends multiple messages with staggered timing
+        function botSayMulti(messages, quickReplies) {
+            let totalDelay = 0;
+            messages.forEach((msg, i) => {
+                const isLast = i === messages.length - 1;
+                const delay = getDelay(msg.text || msg);
+                totalDelay += (i === 0 ? delay : delay + 300 + Math.random() * 400);
+
+                setTimeout(() => {
+                    hideTyping();
+                    if (typeof msg === 'string') {
+                        addMessage(msg, 'bot');
+                    } else {
+                        addMessage(msg.text, 'bot', msg.extra);
+                    }
+                    if (isLast && quickReplies) {
+                        addQuickReplies(quickReplies);
+                    } else if (!isLast) {
+                        showTyping();
+                    }
+                    document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+                }, totalDelay);
+            });
+        }
+
+        // ══════════════════════════════════════════
+        // MODE SWITCHING & CONVERSATION LOGIC
+        // ══════════════════════════════════════════
+        function setMode(m) {
+            mode = m;
+            step = 0;
+            userData = {};
+            ownershipAsked = false;
+            messageCount = 0;
+            document.getElementById('modeShower').classList.toggle('active', m === 'showerheads');
+            document.getElementById('modeAll').classList.toggle('active', m === 'all');
+            document.getElementById('chatArea').innerHTML = '';
+            startConversation();
+        }
+
+        function startConversation() {
+            botSay(ownershipStep.question, ownershipStep.quickReplies);
+        }
+
+        function getActiveSteps() {
+            if (mode === 'showerheads') return showerSteps;
+            return getAllSteps();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            removeQuickReplies();
+            addMessage(text, 'user');
+
+            // Handle ownership question first
+            if (!ownershipAsked) {
+                const parsed = ownershipStep.parse(text);
+                if (parsed === null) {
+                    botSay("Hmm, I didn't quite catch that. Are you a homeowner, renter, or building owner/manager?", ownershipStep.quickReplies);
+                    return;
+                }
+                userData.ownerType = parsed;
+                ownershipAsked = true;
+                step = 0;
+
+                const steps = getActiveSteps();
+                let greetings;
+                if (mode === 'showerheads') {
+                    greetings = parsed === 'building_owner'
+                        ? ["Great -- I can help you find the right showerheads for your building and calculate savings across all your units.", steps[0].question]
+                        : parsed === 'renter'
+                        ? ["Good news -- swapping a showerhead is a 5-minute job and doesn't need landlord approval. Let me find the right one.", steps[0].question]
+                        : ["Let's find you the perfect showerhead upgrade. I just need a few quick details.", steps[0].question];
+                } else {
+                    greetings = parsed === 'building_owner'
+                        ? ["I'll help identify the highest-ROI efficiency upgrades for your building -- including ESCO-financed projects that require zero upfront capital.", "I just need to ask a few questions to tailor my recommendations. " + steps[0].question]
+                        : parsed === 'renter'
+                        ? ["Even as a renter, there are some solid options that can cut your bills without any landlord approval needed.", "Let me ask a few quick questions. " + steps[0].question]
+                        : ["I'll help you find the upgrades with the best return on investment. Let me ask a few questions to personalize the recommendations.", steps[0].question];
+                }
+                botSayMulti(greetings, steps[0].quickReplies);
+                return;
+            }
+
+            const steps = getActiveSteps();
+
+            if (step >= steps.length) {
+                botSay("You can switch modes with the toggle above, or head to the <a href='index.html' style='color:var(--accent-secondary)'>full calculator</a> for a deeper analysis.");
+                return;
+            }
+
+            const currentStep = steps[step];
+            const parsed = currentStep.parse(text);
+
+            if (parsed === null) {
+                botSay("Hmm, I wasn't able to interpret that. Could you try again, or tap one of the options below?", currentStep.quickReplies);
+                return;
+            }
+
+            userData[currentStep.field] = parsed;
+            step++;
+
+            if (step < steps.length) {
+                const next = steps[step];
+                const ackType = currentStep.ackType || 'neutral';
+                const acknowledgment = pick(acks[ackType] || acks.neutral);
+
+                // Maybe insert a fun fact between questions
+                const fact = currentStep.funFactTopic ? maybeFunFact(currentStep.funFactTopic) : null;
+
+                if (fact) {
+                    // Ack -> fun fact -> next question (3 bubbles)
+                    const factEl = document.createElement('div');
+                    factEl.className = 'fun-fact';
+                    factEl.textContent = fact;
+                    botSayMulti([
+                        acknowledgment,
+                        { text: '', extra: factEl },
+                        next.question,
+                    ], next.quickReplies);
+                } else {
+                    // Ack + next question (2 bubbles, or combined if short)
+                    botSayMulti([
+                        acknowledgment + " " + next.question,
+                    ], next.quickReplies);
+                }
+            } else {
+                // Acknowledge then generate results
+                const ackType = currentStep.ackType || 'neutral';
+                botSay(pick(acks[ackType] || acks.neutral) + " Let me crunch the numbers...");
+                setTimeout(() => {
+                    if (mode === 'showerheads') {
+                        generateShowerResults();
+                    } else {
+                        generateAllResults();
+                    }
+                }, 1200);
+            }
+        }
+
+        // ══════════════════════════════════════════
+        // SHOWERHEAD RESULTS (with real equations)
+        // ══════════════════════════════════════════
+        function generateShowerResults() {
+            const people = userData.people >= 5 ? 5 : userData.people;
+            const duration = userData.duration;
+            const currentGPM = userData.currentGPM;
+            const priority = userData.priority;
+
+            const galPerShower = currentGPM * duration;
+            const waterCostPerGal = C.waterRatePerGal;
+            const energyCostPerGal = C.hotWaterFraction * C.energyPerGalHeated / C.electricWHeff * C.electricityRate;
+            const costPerShower = galPerShower * (waterCostPerGal + energyCostPerGal);
+            const annualCost = costPerShower * people * 365;
+            const annualGallons = galPerShower * people * 365;
+
+            // Show the equation first
+            const eqEl = document.createElement('div');
+            eqEl.className = 'equation-card';
+            eqEl.innerHTML = '<div class="eq-label">How I calculated this</div>' +
+                '<code>' + currentGPM + ' GPM</code> x <code>' + duration + ' min</code> = <code>' + galPerShower.toFixed(1) + ' gal/shower</code><br>' +
+                'Water cost: <code>' + galPerShower.toFixed(1) + ' gal x $' + waterCostPerGal.toFixed(4) + '/gal</code><br>' +
+                'Energy cost: <code>' + galPerShower.toFixed(1) + ' gal x 70% hot x 0.171 kWh/gal &divide; 0.92 eff x $' + C.electricityRate + '/kWh</code><br>' +
+                'Per shower: <code>$' + costPerShower.toFixed(2) + '</code> x <code>' + people + ' people</code> x <code>365 days</code> = <code>$' + Math.round(annualCost) + '/year</code>';
+
+            const breakdownHTML = '<div class="result-card">' +
+                '<h4>Your Current Shower Costs</h4>' +
+                '<div class="result-row"><span class="result-label">Gallons per shower</span><span class="result-value">' + galPerShower.toFixed(1) + ' gal</span></div>' +
+                '<div class="result-row"><span class="result-label">Cost per shower</span><span class="result-value red">$' + costPerShower.toFixed(2) + '</span></div>' +
+                '<div class="result-row"><span class="result-label">Monthly (household)</span><span class="result-value red">$' + Math.round(annualCost / 12) + '</span></div>' +
+                '<div class="result-divider"></div>' +
+                '<div class="result-row"><span class="result-label"><strong>Annual cost</strong></span><span class="result-value red"><strong>$' + Math.round(annualCost) + '</strong></span></div>' +
+                '<div class="result-row"><span class="result-label">Annual water used</span><span class="result-value">' + annualGallons.toLocaleString() + ' gal</span></div>' +
+                '</div>';
+            const breakdownEl = document.createElement('div');
+            breakdownEl.innerHTML = breakdownHTML;
+
+            botSay("Here's what your household is spending on showers right now:", null, breakdownEl.firstChild);
+
+            setTimeout(() => {
+                addMessage('', 'bot', eqEl);
+                document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+            }, 1600);
+
+            // Pick recommendation
+            let recommended, runner;
+            if (priority === 'savings') {
+                recommended = fixtures[0]; runner = fixtures[1];
+            } else if (priority === 'comfort') {
+                recommended = fixtures[2]; runner = fixtures[3];
+            } else {
+                recommended = fixtures[1]; runner = fixtures[2];
+            }
+
+            setTimeout(() => {
+                // Calculate savings for recommended
+                const galNew = recommended.measuredGPM * duration;
+                const costNew = galNew * (waterCostPerGal + energyCostPerGal);
+                const annualNew = costNew * people * 365;
+                const annualSavings = annualCost - annualNew;
+                const monthlySavings = annualSavings / 12;
+                const paybackMonths = (recommended.price / monthlySavings).toFixed(1);
+                const waterSavedGal = (galPerShower - galNew) * people * 365;
+
+                // Runner up
+                const galNew2 = runner.measuredGPM * duration;
+                const costNew2 = galNew2 * (waterCostPerGal + energyCostPerGal);
+                const annualSavings2 = annualCost - (costNew2 * people * 365);
+
+                const reasonMap = {
+                    savings: 'Lowest measured flow rate at the lowest price -- maximum dollar savings.',
+                    comfort: 'Patented technology maintains strong pressure feel even at low flow rates.',
+                    value: 'Best balance of water savings and shower experience for the price.'
+                };
+
+                // Context comparison
+                let comparison = '';
+                if (annualSavings > 200) {
+                    comparison = "That's roughly " + Math.round(annualSavings / 16) + " Netflix subscriptions per year.";
+                } else if (annualSavings > 80) {
+                    comparison = "That covers about " + Math.round(annualSavings / 15) + " months of Netflix.";
+                }
+
+                botSay("Based on what matters to you, I'd recommend the <strong>" + recommended.name + "</strong>. Here's why:");
+
+                setTimeout(() => {
+                    const recHTML = '<div class="rec-card">' +
+                        '<div class="rec-card-name">' + recommended.name + '</div>' +
+                        '<div class="rec-card-reason">' + reasonMap[priority] + '</div>' +
+                        '<div class="rec-card-stats">' +
+                            '<div class="rec-stat"><div class="rec-stat-value">$' + recommended.price.toFixed(2) + '</div><div class="rec-stat-label">Price</div></div>' +
+                            '<div class="rec-stat"><div class="rec-stat-value">' + recommended.measuredGPM + ' GPM</div><div class="rec-stat-label">Measured Flow</div></div>' +
+                            '<div class="rec-stat"><div class="rec-stat-value green">$' + Math.round(annualSavings) + '/yr</div><div class="rec-stat-label">Your Savings</div></div>' +
+                            '<div class="rec-stat"><div class="rec-stat-value blue">' + paybackMonths + ' mo</div><div class="rec-stat-label">Pays For Itself</div></div>' +
+                        '</div>' +
+                        '<div style="font-size:0.82rem;color:var(--text-muted);margin:0.4rem 0 0.5rem;">Saves ' + waterSavedGal.toLocaleString() + ' gallons/year -- that\'s roughly ' + Math.round(waterSavedGal / 30) + ' loads of laundry worth of water.</div>' +
+                        '<a class="rec-card-link" href="' + recommended.url + '" target="_blank" rel="noopener">View on Amazon &rarr;</a>' +
+                        '</div>';
+                    const recEl = document.createElement('div');
+                    recEl.innerHTML = recHTML;
+                    addMessage('', 'bot', recEl.firstChild);
+                    document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+
+                    setTimeout(() => {
+                        const rec2HTML = '<div class="rec-card">' +
+                            '<div class="rec-card-name">' + runner.name + '</div>' +
+                            '<div class="rec-card-reason">Runner-up -- ' + runner.note + '</div>' +
+                            '<div class="rec-card-stats">' +
+                                '<div class="rec-stat"><div class="rec-stat-value">$' + runner.price.toFixed(2) + '</div><div class="rec-stat-label">Price</div></div>' +
+                                '<div class="rec-stat"><div class="rec-stat-value">' + runner.measuredGPM + ' GPM</div><div class="rec-stat-label">Measured Flow</div></div>' +
+                                '<div class="rec-stat"><div class="rec-stat-value green">$' + Math.round(annualSavings2) + '/yr</div><div class="rec-stat-label">Your Savings</div></div>' +
+                            '</div>' +
+                            '<a class="rec-card-link" href="' + runner.url + '" target="_blank" rel="noopener">View on Amazon &rarr;</a>' +
+                            '</div>';
+                        const rec2El = document.createElement('div');
+                        rec2El.innerHTML = rec2HTML;
+                        botSay("Also worth considering as a runner-up:", null, rec2El.firstChild);
+
+                        setTimeout(() => {
+                            const tenYear = annualSavings * 10;
+                            let closing = "Over 10 years, the <strong>" + recommended.name + "</strong> saves you roughly <strong>$" + Math.round(tenYear).toLocaleString() + "</strong>.";
+                            if (comparison) closing += " " + comparison;
+                            closing += " All from a 5-minute install -- no plumber needed.";
+                            botSay(closing, ['Start over', 'Switch to All Upgrades', 'View full calculator']);
+                        }, 1800);
+                    }, 1800);
+                }, 1200);
+            }, 3200);
+        }
+
+        // ══════════════════════════════════════════
+        // ALL-UPGRADES RESULTS (with equations & comparisons)
+        // ══════════════════════════════════════════
+        function generateAllResults() {
+            const ownerType = userData.ownerType;
+            const isBuilding = ownerType === 'building_owner';
+            const isRenter = ownerType === 'renter';
+            const homeType = userData.homeType;
+            const homeAge = userData.homeAge;
+            const monthlyBill = userData.monthlyBill;
+            const existing = userData.existing || '';
+            const heatingType = userData.heatingType || 'unknown';
+            const painPoint = userData.painPoint || 'high_bills';
+            const budget = userData.budget || 'moderate';
+
+            // Filter upgrades based on context
+            let applicable = upgrades.filter(u => {
+                // Scale filter: building owners see commercial + residential, others see residential only
+                if (!isBuilding && u.scale === 'commercial') return false;
+                if (isBuilding && u.scale === 'residential' && !['Low-Flow Showerheads', 'Low-Flow Faucet Aerators', 'High-Efficiency Toilets'].includes(u.name)) return false;
+                return true;
+            });
+
+            // Renters: only renter-friendly upgrades
+            if (isRenter) {
+                applicable = applicable.filter(u => u.renterOk);
+            }
+
+            // Apartments: no attic
+            if (homeType === 'apartment') {
+                applicable = applicable.filter(u => !u.needsAttic);
+            }
+
+            // Budget filter for non-building owners
+            if (!isBuilding) {
+                if (budget === 'minimal') {
+                    applicable = applicable.filter(u => u.savingsLow <= 100 || u.renterOk);
+                }
+            }
+
+            // Remove things they've already done
+            if (existing.includes('led')) {
+                applicable = applicable.filter(u => !u.name.includes('LED'));
+            }
+            if (existing.includes('thermostat') || existing.includes('bas') || existing.includes('control')) {
+                applicable = applicable.filter(u => u.name !== 'Smart Thermostat' && !u.name.includes('Building Automation'));
+            }
+            if (existing.includes('low-flow') || existing.includes('flow') || existing.includes('fixture')) {
+                applicable = applicable.filter(u => !u.name.includes('Low-Flow') && !u.name.includes('Showerhead'));
+            }
+            if (existing.includes('insulation')) {
+                applicable = applicable.filter(u => !u.name.includes('Insulation'));
+            }
+            if (existing.includes('boiler')) {
+                applicable = applicable.filter(u => !u.name.includes('Boiler'));
+            }
+
+            // Score upgrades based on context
+            const billFactor = monthlyBill ? monthlyBill / (isBuilding ? 10000 : 200) : 1;
+            const ageFactor = homeAge > 40 ? 1.3 : homeAge > 20 ? 1.1 : 0.9;
+
+            applicable.forEach(u => {
+                let score = ((u.savingsLow + u.savingsHigh) / 2) * Math.min(billFactor, 1.5) * ageFactor;
+
+                // Boost based on pain points
+                if (painPoint === 'water_waste' && u.category === 'water') score *= 1.3;
+                if (painPoint === 'comfort' && (u.name.includes('Insulation') || u.name.includes('Air Sealing') || u.name.includes('Window'))) score *= 1.3;
+                if (painPoint === 'high_bills') score *= 1.1;
+                if (painPoint === 'compliance' && (u.name.includes('ESCO') || u.name.includes('BAS'))) score *= 1.4;
+                if (painPoint === 'tenant_complaints' && (u.name.includes('Hot Water') || u.name.includes('Submeter'))) score *= 1.3;
+
+                // Boost heating-related if using oil (more expensive fuel)
+                if (heatingType === 'oil' && u.category === 'energy') score *= 1.2;
+
+                u.score = score;
+                u.estimatedSavings = Math.round(((u.savingsLow + u.savingsHigh) / 2) * Math.min(billFactor, 1.5));
+            });
+
+            applicable.sort((a, b) => b.score - a.score);
+
+            // Context message
+            let context;
+            if (isBuilding) {
+                context = homeAge > 30
+                    ? "Your building's age suggests significant efficiency opportunities. ESCO studies show older buildings typically achieve 20-35% energy reductions."
+                    : homeAge > 15
+                    ? "Buildings of this vintage often have aging mechanical systems ripe for upgrades."
+                    : "Even newer buildings benefit from operational improvements and controls.";
+            } else if (isRenter) {
+                context = "As a renter, you still have solid options that don't require landlord approval and can lower your bills immediately.";
+            } else {
+                context = homeAge > 25
+                    ? "Given your home's age, you'll likely see savings on the higher end of these ranges."
+                    : homeAge > 10
+                    ? "Your home is at a good age for selective upgrades."
+                    : "Your newer home likely has decent efficiency already, so focus on the quick wins.";
+            }
+
+            // Insert a relevant fun fact before results
+            const topicMap = { building_owner: 'building', renter: 'water', homeowner: 'heating' };
+            const preResultFact = maybeFunFact(topicMap[ownerType] || 'heating');
+            if (preResultFact) {
+                const factEl = document.createElement('div');
+                factEl.className = 'fun-fact';
+                factEl.textContent = preResultFact;
+                addMessage('', 'bot', factEl);
+            }
+
+            botSay("Alright, here's my analysis -- " + context);
+
+            // Show upgrades in tiers
+            let totalLow = 0, totalHigh = 0;
+
+            function makeUpgradeHTML(items) {
+                let html = '';
+                items.forEach(u => {
+                    totalLow += u.savingsLow;
+                    totalHigh += u.savingsHigh;
+                    const eq = upgradeEquations[u.name];
+                    html += '<div class="upgrade-card">' +
+                        '<div class="upgrade-card-name">' + u.name + '</div>' +
+                        '<div class="upgrade-card-source">Source: ' + u.source + '</div>' +
+                        '<div class="upgrade-card-stats">' +
+                            '<div class="rec-stat"><div class="rec-stat-value">' + u.cost + '</div><div class="rec-stat-label">Cost</div></div>' +
+                            '<div class="rec-stat"><div class="rec-stat-value green">' + u.annualSavings + '</div><div class="rec-stat-label">Annual Savings</div></div>' +
+                            '<div class="rec-stat"><div class="rec-stat-value blue">' + u.payback + '</div><div class="rec-stat-label">Payback</div></div>' +
+                        '</div>' +
+                        '<div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.4rem;">' + u.detail + '</div>';
+
+                    // Add equation and comparison if available
+                    if (eq) {
+                        html += '<div class="equation-card" style="margin-top:0.5rem;">' +
+                            '<div class="eq-label">The math</div>' +
+                            '<code style="font-size:0.75rem;">' + eq.equation + '</code><br>' +
+                            '<span style="font-style:italic;font-size:0.78rem;color:var(--text-muted);">' + eq.comparison + '</span>' +
+                            '</div>';
+                    }
+
+                    html += '</div>';
+                });
+                return html;
+            }
+
+            setTimeout(() => {
+                // Quick wins: payback under 1 year
+                const quickWins = applicable.filter(u =>
+                    u.payback.includes('month') && !u.payback.includes('12') && !u.payback.includes('18')
+                ).slice(0, 4);
+
+                if (quickWins.length > 0) {
+                    const qwEl = document.createElement('div');
+                    qwEl.innerHTML = makeUpgradeHTML(quickWins);
+                    botSay("<strong>Quick Wins</strong> — fast payback, low cost:", null, qwEl);
+                }
+
+                // Medium-term
+                setTimeout(() => {
+                    const remaining = applicable.filter(u => !quickWins.includes(u));
+                    const medTerm = remaining.filter(u => {
+                        const years = parseInt(u.payback);
+                        return u.payback.includes('year') ? years <= 5 : !quickWins.includes(u);
+                    }).slice(0, 4);
+
+                    if (medTerm.length > 0) {
+                        const mtEl = document.createElement('div');
+                        mtEl.innerHTML = makeUpgradeHTML(medTerm);
+                        botSay("<strong>Worth the Investment</strong> — moderate cost, strong returns:", null, mtEl);
+                    }
+
+                    // Long-term / major projects (building owners especially)
+                    setTimeout(() => {
+                        const longTerm = remaining.filter(u => !medTerm.includes(u)).slice(0, 3);
+
+                        if (longTerm.length > 0) {
+                            const ltEl = document.createElement('div');
+                            ltEl.innerHTML = makeUpgradeHTML(longTerm);
+                            const label = isBuilding ? "<strong>Major Capital Projects</strong> — highest total savings:" : "<strong>Long-Term Upgrades</strong> — significant investment, major impact:";
+                            botSay(label, null, ltEl);
+                        }
+
+                        // Summary
+                        setTimeout(() => {
+                            const totalSummary = '<div class="result-card">' +
+                                '<h4>Potential Combined Savings</h4>' +
+                                '<div class="result-row"><span class="result-label">Annual savings range</span><span class="result-value green">$' + totalLow.toLocaleString() + ' - $' + totalHigh.toLocaleString() + '</span></div>' +
+                                '<div class="result-row"><span class="result-label">10-year total</span><span class="result-value green">$' + (totalLow * 10).toLocaleString() + ' - $' + (totalHigh * 10).toLocaleString() + '</span></div>' +
+                                '<div class="result-row"><span class="result-label">Monthly reduction</span><span class="result-value green">$' + Math.round(totalLow / 12).toLocaleString() + ' - $' + Math.round(totalHigh / 12).toLocaleString() + '</span></div>' +
+                                '</div>';
+
+                            const sumEl = document.createElement('div');
+                            sumEl.innerHTML = totalSummary;
+                            botSay("Here's what it all adds up to if you implemented every recommended upgrade:", null, sumEl.firstChild);
+
+                            setTimeout(() => {
+                                let closingMsg;
+                                if (isBuilding) {
+                                    closingMsg = "For larger-scale projects, an <strong>Energy Performance Contract (ESCO)</strong> can finance the work with zero upfront cost — you pay from the guaranteed savings. I'd recommend starting with the quick wins to build momentum, then exploring an ESCO for the capital-intensive upgrades.";
+                                } else if (isRenter) {
+                                    closingMsg = "My recommendation: start with low-flow fixtures and smart power strips. They cost under $50 combined, require no landlord approval, and can save you $100+ per year. You could also ask your landlord about LED upgrades or a smart thermostat — many are happy to invest in things that improve the property.";
+                                } else {
+                                    closingMsg = "My recommendation: start with the quick wins — they pay for themselves in weeks and you'll see the savings on your very next bill. The showerhead swap takes 5 minutes and delivers some of the best returns per dollar of any home improvement.";
+                                }
+                                botSay(closingMsg, ['Start over', 'Switch to Showerheads', 'View full calculator']);
+
+                                // Add inquiry form for building owners and homeowners (not renters, not showerhead mode)
+                                if (!isRenter) {
+                                    setTimeout(() => {
+                                        const formId = 'inquiryForm_' + Date.now();
+                                        const inquiryHTML = '<div class="inquiry-form" id="' + formId + '">' +
+                                            '<h4>Want a personalized assessment?</h4>' +
+                                            '<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">' +
+                                            (isBuilding
+                                                ? 'Submit your info below and we\'ll send you a detailed savings report for your building, including ESCO eligibility and available incentives.'
+                                                : 'Leave your details and we\'ll send you a customized report with specific product recommendations and local rebate information.') +
+                                            '</p>' +
+                                            '<label for="' + formId + '_name">Name</label>' +
+                                            '<input type="text" id="' + formId + '_name" placeholder="Your name">' +
+                                            '<label for="' + formId + '_email">Email</label>' +
+                                            '<input type="email" id="' + formId + '_email" placeholder="you@email.com">' +
+                                            (isBuilding ? '<label for="' + formId + '_bldg">Building name or address</label><input type="text" id="' + formId + '_bldg" placeholder="123 Main St or Building Name">' : '') +
+                                            '<label for="' + formId + '_notes">Anything else we should know?</label>' +
+                                            '<textarea id="' + formId + '_notes" placeholder="Optional — specific goals, timeline, etc."></textarea>' +
+                                            '<button onclick="submitInquiry(\'' + formId + '\')">Request More Info</button>' +
+                                            '</div>';
+
+                                        const formEl = document.createElement('div');
+                                        formEl.innerHTML = inquiryHTML;
+                                        botSay("If you'd like to take the next step, you can request a more detailed assessment below:", null, formEl.firstChild);
+                                    }, 1800);
+                                }
+                            }, 1500);
+                        }, 1800);
+                    }, 1800);
+                }, 1800);
+            }, 1500);
+        }
+
+        // ── Inquiry form submission ──
+        function submitInquiry(formId) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            const name = form.querySelector('input[placeholder="Your name"]').value.trim();
+            const email = form.querySelector('input[type="email"]').value.trim();
+
+            if (!name || !email) {
+                // Briefly highlight empty fields
+                if (!name) form.querySelector('input[placeholder="Your name"]').style.borderColor = 'var(--accent-primary)';
+                if (!email) form.querySelector('input[type="email"]').style.borderColor = 'var(--accent-primary)';
+                return;
+            }
+
+            // Validate email format
+            if (!email.includes('@') || !email.includes('.')) {
+                form.querySelector('input[type="email"]').style.borderColor = 'var(--accent-primary)';
+                return;
+            }
+
+            // Collect all form data
+            const bldgInput = form.querySelector('input[placeholder="123 Main St or Building Name"]');
+            const notesInput = form.querySelector('textarea');
+            const inquiryData = {
+                name: name,
+                email: email,
+                building: bldgInput ? bldgInput.value.trim() : '',
+                notes: notesInput ? notesInput.value.trim() : '',
+                ownerType: userData.ownerType,
+                homeType: userData.homeType,
+                homeAge: userData.homeAge,
+                heatingType: userData.heatingType,
+                monthlyBill: userData.monthlyBill,
+                painPoint: userData.painPoint,
+                budget: userData.budget,
+                buildingSize: userData.buildingSize || '',
+                timestamp: new Date().toISOString()
+            };
+
+            // Store in localStorage as a simple backend
+            const existing = JSON.parse(localStorage.getItem('waterEconInquiries') || '[]');
+            existing.push(inquiryData);
+            localStorage.setItem('waterEconInquiries', JSON.stringify(existing));
+
+            // Replace form with success message
+            form.innerHTML = '<div class="inquiry-success">' +
+                'Thanks, ' + name + '! Your inquiry has been submitted. We\'ll review your details and get back to you at ' + email + '.' +
+                '</div>';
+
+            // Log to console for easy access
+            console.log('New inquiry submitted:', inquiryData);
+        }
+
+        // ── Handle special quick replies ──
+        const origSendMessage = sendMessage;
+        sendMessage = function() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim().toLowerCase();
+
+            if (text === 'start over') {
+                input.value = '';
+                removeQuickReplies();
+                setMode(mode);
+                return;
+            }
+            if (text === 'switch to all upgrades') {
+                input.value = '';
+                removeQuickReplies();
+                setMode('all');
+                return;
+            }
+            if (text === 'switch to showerheads') {
+                input.value = '';
+                removeQuickReplies();
+                setMode('showerheads');
+                return;
+            }
+            if (text === 'view full calculator') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            origSendMessage();
+        };
+
+        // ── Start ──
+        document.addEventListener('DOMContentLoaded', startConversation);
+    </script>
+</body>
+</html>

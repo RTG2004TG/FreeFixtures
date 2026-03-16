@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | The Economics of Water Conservation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f9f7f4;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0ebe3;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6b6b6b;
+            --accent-primary: #c73b3b;
+            --accent-secondary: #2e7d6f;
+            --border-light: #e0dcd4;
+            --border-dark: #c4bfb6;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        nav a.active {
+            color: var(--text-primary);
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .about-header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-header .about-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+
+        .about-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .author-section {
+            display: flex;
+            gap: 2.5rem;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+        }
+
+        .author-photo {
+            flex-shrink: 0;
+            width: 180px;
+            height: 180px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+        }
+
+        .author-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .author-photo .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info .author-role {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .author-info .author-bio {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .author-info .author-bio p {
+            margin-bottom: 0.75rem;
+        }
+
+        .author-info .author-bio p:last-child {
+            margin-bottom: 0;
+        }
+
+        .thesis-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .thesis-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--text-primary);
+        }
+
+        .thesis-section p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .thesis-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-sources {
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+
+        .data-sources h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .data-sources p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-light);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 700px) {
+            .author-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .author-photo {
+                width: 140px;
+                height: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">The Economics of Water</a>
+            <nav>
+                <ul>
+                    <li><a href="about.html" class="active">About The Thesis</a></li>
+                    <li><a href="index.html">Calculator</a></li>
+                    <li><a href="index.html#behind">Equations</a></li>
+                    <li><a href="shop-fixtures.html">Shop Fixtures</a></li>
+                    <li><a href="ai-recommender.html">AI Recommender</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="about-header">
+            <div class="about-label">Senior Thesis</div>
+            <h1>The Economics of Water Conservation</h1>
+            <p>How Upgrading Showerheads Can Save Money and Help the Environment</p>
+        </div>
+
+        <div class="author-section">
+            <div class="author-photo">
+                <!-- Replace theo.jpg with your actual photo filename -->
+                <img src="theo.jpg" alt="Theo Goldman" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'photo-placeholder\'>Photo</div>';">
+            </div>
+            <div class="author-info">
+                <h2>Theo Goldman</h2>
+                <div class="author-role">Author</div>
+                <div class="author-bio">
+                    <p>Thank you for visiting my site. I am a current senior at Union College in Schenectady, New York, studying Economics and Environmental Science. I developed this website as part of my senior thesis, <em>Low Flow, High Return: The Economics of Efficient Showerheads</em>.</p>
+                    <p>In the thesis, I explore how fixture retrofits can save building owners money while simultaneously helping the environment. Throughout my research, I noticed that many people simply did not understand the cost savings available through efficiency. This website was created to be a clear and transparent breakdown of cost savings and financial metrics — to show people the real savings beyond the sticker price.</p>
+                    <p>Importantly, the calculations on this site are projections. Users should measure flow rates themselves using the methodology found in the thesis for improved accuracy.</p>
+                    <p style="margin-top:0.75rem;"><strong>Contact:</strong> <a href="mailto:goldmanr@union.edu" style="color:var(--accent-secondary);">goldmanr@union.edu</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <a href="thesiswriting.pdf" download style="display:inline-block; background:var(--accent-secondary); color:#fff; padding:0.6rem 1.25rem; border-radius:4px; text-decoration:none; font-size:0.88rem; font-weight:600; letter-spacing:0.02em; transition:background 0.2s;" onmouseover="this.style.background='#246b5e'" onmouseout="this.style.background='var(--accent-secondary)'">Download the Full Thesis (PDF)</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>Senior Thesis | Water Conservation Economics</p>
+        <p style="margin-top: 0.5rem;">Data: EPA WaterSense, DOE, EIA, USGS</p>
+    </footer>
+</body>
+</html>
